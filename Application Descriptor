@@ -1,0 +1,8 @@
+MIDlet-Vendor: shinovon
+MIDlet-Version: 2.0.0
+MIDlet-Icon: /icon.png
+MicroEdition-Configuration: CLDC-1.0
+MIDlet-1: MD5 Bench,/icon.png,MD5BenchMIDlet
+MIDlet-Name: MD5 Bench
+MicroEdition-Profile: MIDP-1.0
+MIDlet-Jar-URL: MD5Bench.jar
