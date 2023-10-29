@@ -2,20 +2,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Gauge;
 import javax.microedition.midlet.MIDlet;
 
 import md5.MD5;
 
-public class MD5BenchMIDlet extends MIDlet implements CommandListener, Runnable {
+public class MD5BenchMIDlet extends MIDlet implements Runnable {
 	private final static String rightHash = "ab5d9e7f6ee29fe76594c6c1cda2f992";
-	private Gauge g1;
-	private Gauge g2;
+	private MD5BenchCanvas canv;
 	
 	public void run() {
 		try {
@@ -45,18 +39,17 @@ public class MD5BenchMIDlet extends MIDlet implements CommandListener, Runnable 
 						fail = true;
 						break;
 					}
-					g1.setLabel("Testing... (" + (i+1) + "/" + iterations + ")");
+					canv.soft((i*100)/iterations, "Testing... (" + (i+1) + "/" + iterations + ")");
 					Thread.yield();
 				}
 				softHashTime /= (double)iterations;
 				System.out.println("soft init time: " + softInitTime);
 				System.out.println("soft hash time: " + softHashTime);
 				if(fail) {
-					g1.setLabel("Failed");
+					canv.soft(-1, "Failed");
 				} else {
 					double[] benchmark = getBenchmark(softInitTime, softHashTime, length);
-					g1.setLabel(benchmark[0]+" (" + benchmark[1] + " Mbit/s)");
-					g1.setValue((int)(benchmark[0]));
+					canv.soft((int)(benchmark[0]), benchmark[0]+" (" + benchmark[1] + " Mbit/s)");
 				}
 			}
 
@@ -80,21 +73,20 @@ public class MD5BenchMIDlet extends MIDlet implements CommandListener, Runnable 
 						break;
 					}
 					Thread.yield();
-					g2.setLabel("Testing... (" + (i+1) + "/" + iterations + ")");
+					canv.jsr((i*100)/iterations, "Testing... (" + (i+1) + "/" + iterations + ")");
 				}
 				jsrHashTime /= (double)iterations;
 				System.out.println("jsr init time: " + jsrInitTime);
 				System.out.println("jsr hash time: " + jsrHashTime);
 				if(fail) {
-					g2.setLabel("Failed");
+					canv.jsr(-1, "Failed");
 				} else {
 					double[] benchmark = getBenchmark(jsrInitTime, jsrHashTime, length);
-					g2.setLabel(benchmark[0]+" (" + benchmark[1] + " Mbit/s)");
-					g2.setValue((int)(benchmark[0]));
+					canv.jsr((int)(benchmark[0]), benchmark[0]+" (" + benchmark[1] + " Mbit/s)");
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
-				g2.setLabel("Not supported");
+				canv.jsr(-1, "Not supported");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -123,18 +115,7 @@ public class MD5BenchMIDlet extends MIDlet implements CommandListener, Runnable 
 	protected void pauseApp() {}
 
 	protected void startApp() {
-		Form f = new Form("MD5 bench");
-		f.addCommand(new Command("Exit", Command.EXIT, 2));
-		f.setCommandListener(this);
-		f.append("Software MD5:\n");
-		g1 = new Gauge("Testing...", false, 1, 0);
-		g1.setMaxValue(100);
-		f.append(g1);
-		f.append("JSR-177 MD5:\n");
-		g2 = new Gauge("Testing...", false, 1, 0);
-		g2.setMaxValue(100);
-		f.append(g2);
-		Display.getDisplay(this).setCurrent(f);
+		Display.getDisplay(this).setCurrent(canv = new MD5BenchCanvas(this));
 		Thread t = new Thread(this);
 		t.setPriority(10);
 		t.start();
@@ -155,9 +136,4 @@ public class MD5BenchMIDlet extends MIDlet implements CommandListener, Runnable 
         inputStream.close();
         return byteArray;
     }
-
-	public void commandAction(Command c, Displayable d) {
-		notifyDestroyed();
-	}
-
 }
