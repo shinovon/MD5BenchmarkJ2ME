@@ -34,16 +34,18 @@ public class MD5BenchCanvas extends Canvas {
 		g.drawString("Software MD5: ", 0, fh+4,0);
 		g.drawString(softt, 10, fh*2+8, 0);
 		g.setColor(0x0000FF);
+		if(soft > 100) soft = 100;
 		if(soft > 0)
-		g.fillRect(6, fh*3+11, (int)((w-12)*(soft/100F)), 23);
+		g.fillRect(6, fh*3+11, (int)((w-11)*(soft/100F)), 23);
 		g.setColor(0);
 		g.drawRect(5, fh*3+10, w-10, 24);
 
 		g.drawString("JSR-177 MD5: ", 0, fh*3+40,0);
 		g.drawString(jsrt, 10, fh*4+44, 0);
 		g.setColor(0x0000FF);
+		if(jsr > 100) jsr = 100;
 		if(jsr > 0)
-		g.fillRect(6, fh*5+47, (int)((w-12)*(jsr/100F)), 23);
+		g.fillRect(6, fh*5+47, (int)((w-11)*(jsr/100F)), 23);
 		g.setColor(0);
 		g.drawRect(5, fh*5+46, w-10, 24);
 	}
